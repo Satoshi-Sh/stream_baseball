@@ -7,17 +7,29 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.dates import DateFormatter
 import japanize_matplotlib
+import numpy as np
+from math import pi
 
 matplotlib.rcParams['text.usetex'] = False
 
+# Add a sidebar for filtering
+sidebar = st.sidebar
 
-df = pd.read_csv('./data/central.csv')
+leagues = ['Central','Pacific']
+selected_league = sidebar.selectbox("Select League", leagues)
+
+
+
+df = pd.read_csv(f"./data/{selected_league.lower()}.csv")
+
+
 df['date'] = pd.to_datetime(df['date'])
+print(df.dtypes)
+
 # Display the original DataFrame
 st.dataframe(df.tail(6))
 
-# Add a sidebar for filtering
-sidebar = st.sidebar
+
 
 # Get a list of all the columns in the DataFrame
 teams = df['チーム名'].unique()
@@ -31,13 +43,14 @@ selected_columns = sidebar.selectbox("Select column to display", columns)
 
 # Filter the DataFrame based on the selected columns
 filtered_df = df[df['チーム名'].isin(selected_values)]
-# Display the filtered DataFrame
-st.dataframe(filtered_df)
 
 # show line plot 
 if len(selected_values)>0:
+    
+    
     # define color for each hue category
-    colors = {'DeNA': 'blue', '阪神': 'yellow', 'ヤクルト': 'purple','広島':'red','巨人':'orange','中日':'black'}
+    colors = {'DeNA': 'blue', '阪神': 'yellow', 'ヤクルト': 'purple','広島':'red','巨人':'orange','中日':'black',
+              'ロッテ':'black','オリックス':'blue','西武':'purple','ソフトバンク':'yellow','楽天':'red','日本ハム':'grey'}
     show_column = selected_columns or '勝率'
     fig,ax = plt.subplots()
     sns.lineplot(filtered_df,x='date',y=show_column, hue='チーム名',ax=ax,palette=colors)
